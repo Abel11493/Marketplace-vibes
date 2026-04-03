@@ -1,11 +1,33 @@
-<div align="center">
+# MarketVibe - Marketplace Nouvelle Génération
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+MarketVibe est une marketplace moderne, sécurisée et entièrement personnalisable grâce à l'IA.
 
-  <h1>Built with AI Studio</h2>
+## 🚀 Déploiement sur GitHub & Domaine Personnalisé
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+Pour déployer ce site sur **marketplacevibes.com**, suivez ces étapes :
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
+### 1. Exportation vers GitHub
+1.  Dans l'éditeur **AI Studio Build**, cliquez sur l'icône **Settings** (engrenage).
+2.  Sélectionnez **"Export to GitHub"**.
+3.  Connectez votre compte et créez un nouveau dépôt.
 
-</div>
+### 2. Configuration du Domaine (marketplacevibes.com)
+Une fois le code sur GitHub, si vous utilisez **GitHub Pages** :
+1.  Allez dans les **Settings** de votre dépôt GitHub.
+2.  Section **Pages**.
+3.  Sous **Custom domain**, entrez `marketplacevibes.com`.
+4.  Configurez vos enregistrements DNS (A, AAAA ou CNAME) chez votre fournisseur de domaine pour pointer vers les serveurs de GitHub.
+
+### 3. Configuration Firebase (Crucial)
+Pour que l'authentification et la base de données fonctionnent sur votre nouveau domaine :
+1.  Allez sur la [Console Firebase](https://console.firebase.google.com/).
+2.  Sélectionnez votre projet.
+3.  Allez dans **Authentication** > **Settings** > **Authorized domains**.
+4.  Ajoutez `marketplacevibes.com` à la liste des domaines autorisés.
+
+## 🛠️ Technologies
+- React 18 + Vite
+- Tailwind CSS
+- Firebase (Auth & Firestore)
+- Google Gemini AI (AI Architect)
+- Framer Motion (Animations)
