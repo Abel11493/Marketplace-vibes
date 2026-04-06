@@ -76,10 +76,12 @@ function MainLayout() {
 }
 
 export default function App() {
+  const basename = import.meta.env.MODE === 'production' ? '/Marketplace-vibes' : '';
+  
   return (
     <AuthProvider>
       <StudioProvider>
-        <Router>
+        <Router basename={basename}>
           <MainLayout />
         </Router>
       </StudioProvider>
