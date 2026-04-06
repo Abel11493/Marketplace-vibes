@@ -7,6 +7,8 @@ import ProductCard from '../components/ProductCard';
 import { User, Star, MessageSquare, ShoppingBag, ArrowLeft } from 'lucide-react';
 import { motion } from 'motion/react';
 
+import { handleFirestoreError, OperationType } from '../lib/firestoreUtils';
+
 export default function SellerProfile() {
   const { id } = useParams();
   const [seller, setSeller] = useState<UserProfile | null>(null);
@@ -19,6 +21,7 @@ export default function SellerProfile() {
     setLoading(true);
 
     // Real-time seller profile
+    const sellerPath = `users/${id}`;
     const unsubSeller = onSnapshot(doc(db, 'users', id), (snap) => {
       if (snap.exists()) {
         setSeller({ uid: snap.id, ...(snap.data() as object) } as UserProfile);
@@ -26,21 +29,27 @@ export default function SellerProfile() {
         setSeller(null);
       }
       setLoading(false);
-    }, (err) => {
-      console.error("Seller profile snapshot error:", err);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.GET, sellerPath);
       setLoading(false);
     });
 
     // Real-time seller products
+    const productsPath = 'products';
     const qProducts = query(collection(db, 'products'), where('sellerId', '==', id));
     const unsubProducts = onSnapshot(qProducts, (snap) => {
       setProducts(snap.docs.map(d => ({ id: d.id, ...d.data() } as Product)));
+    }, (error) => {
+      handleFirestoreError(error, OperationType.GET, productsPath);
     });
 
     // Real-time seller reviews
+    const reviewsPath = 'reviews';
     const qReviews = query(collection(db, 'reviews'), where('sellerId', '==', id));
     const unsubReviews = onSnapshot(qReviews, (snap) => {
       setReviews(snap.docs.map(d => ({ id: d.id, ...d.data() } as Review)));
+    }, (error) => {
+      handleFirestoreError(error, OperationType.GET, reviewsPath);
     });
 
     return () => {

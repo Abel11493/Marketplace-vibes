@@ -10,6 +10,8 @@ interface ProductCardProps {
   product: Product;
 }
 
+import { handleFirestoreError, OperationType } from '../lib/firestoreUtils';
+
 export default function ProductCard({ product }: ProductCardProps) {
   const { user } = useAuth();
   const [isFavorite, setIsFavorite] = useState(false);
@@ -17,8 +19,11 @@ export default function ProductCard({ product }: ProductCardProps) {
   useEffect(() => {
     if (!user) return;
     const favRef = doc(db, 'users', user.uid, 'favorites', product.id);
+    const path = `users/${user.uid}/favorites/${product.id}`;
     const unsubscribe = onSnapshot(favRef, (doc) => {
       setIsFavorite(doc.exists());
+    }, (error) => {
+      handleFirestoreError(error, OperationType.GET, path);
     });
     return unsubscribe;
   }, [user, product.id]);
@@ -27,14 +32,19 @@ export default function ProductCard({ product }: ProductCardProps) {
     e.preventDefault();
     if (!user) return;
     const favRef = doc(db, 'users', user.uid, 'favorites', product.id);
-    if (isFavorite) {
-      await deleteDoc(favRef);
-    } else {
-      await setDoc(favRef, {
-        userId: user.uid,
-        productId: product.id,
-        createdAt: new Date().toISOString()
-      });
+    const path = `users/${user.uid}/favorites/${product.id}`;
+    try {
+      if (isFavorite) {
+        await deleteDoc(favRef);
+      } else {
+        await setDoc(favRef, {
+          userId: user.uid,
+          productId: product.id,
+          createdAt: new Date().toISOString()
+        });
+      }
+    } catch (error) {
+      handleFirestoreError(error, OperationType.WRITE, path);
     }
   };
 

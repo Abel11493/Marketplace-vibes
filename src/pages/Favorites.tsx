@@ -7,6 +7,8 @@ import ProductCard from '../components/ProductCard';
 import { Heart, ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
+import { handleFirestoreError, OperationType } from '../lib/firestoreUtils';
+
 export default function Favorites() {
   const { user } = useAuth();
   const [favoriteProducts, setFavoriteProducts] = useState<Product[]>([]);
@@ -16,26 +18,35 @@ export default function Favorites() {
     if (!user) return;
 
     const favsRef = collection(db, 'users', user.uid, 'favorites');
+    const path = `users/${user.uid}/favorites`;
     const unsubscribe = onSnapshot(favsRef, async (snap) => {
-      const productIds = snap.docs.map(doc => doc.id);
-      
-      if (productIds.length === 0) {
-        setFavoriteProducts([]);
+      try {
+        const productIds = snap.docs.map(doc => doc.id);
+        
+        if (productIds.length === 0) {
+          setFavoriteProducts([]);
+          setLoading(false);
+          return;
+        }
+
+        const products = await Promise.all(
+          productIds.map(async (id) => {
+            const productDoc = await getDoc(doc(db, 'products', id));
+            if (productDoc.exists()) {
+              return { id: productDoc.id, ...(productDoc.data() as object) } as Product;
+            }
+            return null;
+          })
+        );
+
+        setFavoriteProducts(products.filter(p => p !== null) as Product[]);
         setLoading(false);
-        return;
+      } catch (error) {
+        handleFirestoreError(error, OperationType.GET, path);
+        setLoading(false);
       }
-
-      const products = await Promise.all(
-        productIds.map(async (id) => {
-          const productDoc = await getDoc(doc(db, 'products', id));
-          if (productDoc.exists()) {
-            return { id: productDoc.id, ...(productDoc.data() as object) } as Product;
-          }
-          return null;
-        })
-      );
-
-      setFavoriteProducts(products.filter(p => p !== null) as Product[]);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.GET, path);
       setLoading(false);
     });
 

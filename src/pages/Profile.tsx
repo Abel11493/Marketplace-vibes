@@ -6,6 +6,8 @@ import { User, Mail, Shield, Calendar, Edit3, Save, Camera, Store, UserCircle, M
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
+import { handleFirestoreError, OperationType } from '../lib/firestoreUtils';
+
 export default function Profile() {
   const { user, profile } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
@@ -44,6 +46,7 @@ export default function Profile() {
   const handleUpdate = async () => {
     if (!user) return;
     setLoading(true);
+    const path = `users/${user.uid}`;
     try {
       await updateDoc(doc(db, 'users', user.uid), {
         displayName,
@@ -56,8 +59,8 @@ export default function Profile() {
         updatedAt: new Date().toISOString()
       });
       setIsEditing(false);
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      handleFirestoreError(error, OperationType.UPDATE, path);
     } finally {
       setLoading(false);
     }

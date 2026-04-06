@@ -12,6 +12,8 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType>({ user: null, profile: null, loading: true });
 
+import { handleFirestoreError, OperationType } from '../lib/firestoreUtils';
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -30,6 +32,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (firebaseUser) {
         const docRef = doc(db, 'users', firebaseUser.uid);
+        const path = `users/${firebaseUser.uid}`;
         unsubscribeProfile = onSnapshot(docRef, (docSnap) => {
           if (docSnap.exists()) {
             setProfile(docSnap.data() as UserProfile);
@@ -38,7 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
           setLoading(false);
         }, (error) => {
-          console.error("Profile snapshot error:", error);
+          handleFirestoreError(error, OperationType.GET, path);
           setLoading(false);
         });
       } else {

@@ -6,6 +6,8 @@ import { auth, db } from '../lib/firebase';
 import { ShoppingBag, Mail, Lock, User, ArrowRight, Store, UserCircle } from 'lucide-react';
 import { UserRole } from '../types';
 
+import { handleFirestoreError, OperationType } from '../lib/firestoreUtils';
+
 export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -23,13 +25,18 @@ export default function Register() {
       const { user } = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(user, { displayName });
       
-      await setDoc(doc(db, 'users', user.uid), {
-        uid: user.uid,
-        displayName,
-        email,
-        role: 'seller', // Everyone can sell and buy
-        createdAt: new Date().toISOString(),
-      });
+      const path = `users/${user.uid}`;
+      try {
+        await setDoc(doc(db, 'users', user.uid), {
+          uid: user.uid,
+          displayName,
+          email,
+          role: 'seller', // Everyone can sell and buy
+          createdAt: new Date().toISOString(),
+        });
+      } catch (fsError) {
+        handleFirestoreError(fsError, OperationType.WRITE, path);
+      }
       
       navigate('/');
     } catch (err: any) {

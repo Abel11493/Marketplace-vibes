@@ -21,10 +21,10 @@ const DEFAULT_CONFIG: StudioConfig = {
     darkMode: false,
   },
   content: {
-    heroTitle: 'MarketVibe',
+    heroTitle: 'MarketplaceVibes',
     heroSubtitle: 'La marketplace nouvelle génération pour vendre et acheter en toute confiance.',
-    footerText: '© 2026 MarketVibe. Tous droits réservés.',
-    siteName: 'MarketVibe',
+    footerText: '© 2026 MarketplaceVibes. Tous droits réservés.',
+    siteName: 'MarketplaceVibes',
   },
   customStyles: '',
   updatedAt: new Date().toISOString(),
