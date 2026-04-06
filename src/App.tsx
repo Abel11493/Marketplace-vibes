@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { StudioProvider, useStudio } from './contexts/StudioContext';
 import Navbar from './components/Navbar';
@@ -76,12 +76,10 @@ function MainLayout() {
 }
 
 export default function App() {
-  const basename = import.meta.env.MODE === 'production' ? '/Marketplace-vibes' : '';
-  
   return (
     <AuthProvider>
       <StudioProvider>
-        <Router basename={basename}>
+        <Router>
           <MainLayout />
         </Router>
       </StudioProvider>
